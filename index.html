@@ -122,20 +122,20 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .c-btn:disabled{opacity:.3;transform:none;box-shadow:none;cursor:default}
 
 /* Rail — cards are exactly 1/3 of container width → 3 always fully visible */
-.c-outer{overflow:hidden;border-radius:var(--r)}
-.c-rail{display:flex;gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+/* c-outer is the size reference for cards via container queries */
+.c-outer{overflow:hidden;border-radius:var(--r);container-type:inline-size}
+.c-rail{display:flex;gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;scrollbar-width:none;width:100%}
 .c-rail::-webkit-scrollbar{display:none}
-/* Each card = exactly 1/3 of rail width (desktop) */
-.p-card{flex-shrink:0;scroll-snap-align:start;width:calc((100% - 40px) / 3)}
-
-/* 2 visible on mobile */
+/* Cards: exactly 1/3 of .c-outer (cqi = container query inline) */
+.p-card{flex-shrink:0;scroll-snap-align:start;width:calc((100cqi - 40px) / 3)}
+/* Mobile: 2 visible */
 @media(max-width:860px){
   .c-rail{gap:14px}
-  .p-card{width:calc((100% - 14px) / 2)}
+  .p-card{width:calc((100cqi - 14px) / 2)}
 }
 @media(max-width:480px){
   .c-rail{gap:10px}
-  .p-card{width:calc((100% - 10px) / 2)}
+  .p-card{width:calc((100cqi - 10px) / 2)}
 }
 
 /* Browser mockup */
@@ -362,30 +362,6 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
         <!-- Card 2 -->
         <div class="p-card">
           <div class="b-frame">
-            <div class="b-bar"><div class="b-dots"><div class="b-dot bd-r"></div><div class="b-dot bd-y"></div><div class="b-dot bd-g"></div></div><div class="b-url">sitelynxweb.github.io/noble-and-blade</div></div>
-            <div class="b-vp">
-              <iframe src="https://sitelynxweb.github.io/noble-and-blade" title="Noble & Blade" loading="lazy" onerror="iFail(this)"></iframe>
-              <div class="b-fb"><span class="b-fb-ico">✂️</span>Noble &amp; Blade</div>
-            </div>
-          </div>
-          <div class="card-lbl"><div class="card-name">Noble &amp; Blade</div><div class="card-type">Barbershop · Demo Site</div></div>
-        </div>
-
-        <!-- Card 3 -->
-        <div class="p-card">
-          <div class="b-frame">
-            <div class="b-bar"><div class="b-dots"><div class="b-dot bd-r"></div><div class="b-dot bd-y"></div><div class="b-dot bd-g"></div></div><div class="b-url">sitelynxweb.github.io/apex-realty</div></div>
-            <div class="b-vp">
-              <iframe src="https://sitelynxweb.github.io/apex-realty" title="Apex Realty" loading="lazy" onerror="iFail(this)"></iframe>
-              <div class="b-fb"><span class="b-fb-ico">🏡</span>Apex Realty</div>
-            </div>
-          </div>
-          <div class="card-lbl"><div class="card-name">Apex Realty</div><div class="card-type">Real Estate · Demo Site</div></div>
-        </div>
-
-        <!-- Card 4 -->
-        <div class="p-card">
-          <div class="b-frame">
             <div class="b-bar"><div class="b-dots"><div class="b-dot bd-r"></div><div class="b-dot bd-y"></div><div class="b-dot bd-g"></div></div><div class="b-url">sitelynxweb.github.io/krovex-apparel</div></div>
             <div class="b-vp">
               <iframe src="https://sitelynxweb.github.io/krovex-apparel" title="Krovex Apparel" loading="lazy" onerror="iFail(this)"></iframe>
@@ -396,6 +372,30 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
         </div>
 
 
+
+        <!-- Card 3 -->
+        <div class="p-card">
+          <div class="b-frame">
+            <div class="b-bar"><div class="b-dots"><div class="b-dot bd-r"></div><div class="b-dot bd-y"></div><div class="b-dot bd-g"></div></div><div class="b-url">sitelynxweb.github.io/noble-and-blade</div></div>
+            <div class="b-vp">
+              <iframe src="https://sitelynxweb.github.io/noble-and-blade" title="Noble & Blade" loading="lazy" onerror="iFail(this)"></iframe>
+              <div class="b-fb"><span class="b-fb-ico">✂️</span>Noble &amp; Blade</div>
+            </div>
+          </div>
+          <div class="card-lbl"><div class="card-name">Noble &amp; Blade</div><div class="card-type">Barbershop · Demo Site</div></div>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="p-card">
+          <div class="b-frame">
+            <div class="b-bar"><div class="b-dots"><div class="b-dot bd-r"></div><div class="b-dot bd-y"></div><div class="b-dot bd-g"></div></div><div class="b-url">sitelynxweb.github.io/apex-realty</div></div>
+            <div class="b-vp">
+              <iframe src="https://sitelynxweb.github.io/apex-realty" title="Apex Realty" loading="lazy" onerror="iFail(this)"></iframe>
+              <div class="b-fb"><span class="b-fb-ico">🏡</span>Apex Realty</div>
+            </div>
+          </div>
+          <div class="card-lbl"><div class="card-name">Apex Realty</div><div class="card-type">Real Estate · Demo Site</div></div>
+        </div>
       </div>
     </div>
 
@@ -567,39 +567,51 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 /* 1. CAROUSEL */
 const rail = document.getElementById('cRail');
 
+// JS fallback for browsers without container query support
+function fixCardWidths() {
+  if (CSS.supports('width','1cqi')) return; // CSS handles it natively
+  const outer = document.querySelector('.c-outer');
+  if (!outer) return;
+  const w = window.innerWidth;
+  const gap = w > 860 ? 20 : w > 480 ? 14 : 10;
+  const n   = w > 860 ? 3 : 2;
+  const cardW = (outer.offsetWidth - gap * (n - 1)) / n;
+  document.querySelectorAll('.p-card').forEach(c => c.style.width = cardW + 'px');
+}
+window.addEventListener('resize', fixCardWidths);
+fixCardWidths();
+
 function cMove(dir) {
   if (!rail) return;
   const card = rail.querySelector('.p-card');
   if (!card) return;
   const gap = parseFloat(window.getComputedStyle(rail).columnGap) || 20;
   const step = card.getBoundingClientRect().width + gap;
-  // Clamp to prevent scrolling past first/last card
   const maxScroll = rail.scrollWidth - rail.offsetWidth;
   const target = Math.min(Math.max(rail.scrollLeft + dir * step, 0), maxScroll);
   rail.scrollTo({ left: target, behavior: 'smooth' });
 }
 
-// Arrow disabled states — sync after scroll settles
 function syncBtns() {
   if (!rail) return;
   const atStart = rail.scrollLeft <= 2;
-  const atEnd = rail.scrollLeft + rail.offsetWidth >= rail.scrollWidth - 2;
-  const p = document.getElementById('btnP'); if(p) p.disabled = atStart;
-  const n = document.getElementById('btnN'); if(n) n.disabled = atEnd;
+  const atEnd   = rail.scrollLeft + rail.offsetWidth >= rail.scrollWidth - 2;
+  const p = document.getElementById('btnP'); if (p) p.disabled = atStart;
+  const n = document.getElementById('btnN'); if (n) n.disabled = atEnd;
 }
 if (rail) {
-  // Use 'scrollend' if available, fallback to scroll + debounce
-  const scrollDone = 'onscrollend' in window
-    ? (fn) => rail.addEventListener('scrollend', fn, { passive:true })
-    : (fn) => { let t; rail.addEventListener('scroll', () => { clearTimeout(t); t = setTimeout(fn, 80); }, { passive:true }); };
-  scrollDone(syncBtns);
-  rail.addEventListener('scroll', syncBtns, { passive:true }); // for live disabling
-  setTimeout(syncBtns, 200);
+  let _t;
+  rail.addEventListener('scroll', () => {
+    syncBtns();
+    clearTimeout(_t);
+    _t = setTimeout(syncBtns, 120);
+  }, { passive: true });
+  setTimeout(syncBtns, 300);
 
   // Touch swipe
   let tx = 0;
   rail.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive:true });
-  rail.addEventListener('touchend', e => {
+  rail.addEventListener('touchend',   e => {
     const dx = tx - e.changedTouches[0].clientX;
     if (Math.abs(dx) > 44) cMove(dx > 0 ? 1 : -1);
   }, { passive:true });
